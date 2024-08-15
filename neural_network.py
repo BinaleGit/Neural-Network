@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 # Load the MNIST dataset using TensorFlow
 (train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.mnist.load_data()
@@ -81,8 +82,29 @@ def train(X, Y, learning_rate=0.1, epochs=100):
 def one_hot_encode(labels, num_classes):
     return np.eye(num_classes)[labels]
 
-train_labels = one_hot_encode(train_labels, 10)
-test_labels = one_hot_encode(test_labels, 10)
+train_labels_encoded = one_hot_encode(train_labels, 10)
+test_labels_encoded = one_hot_encode(test_labels, 10)
 
 # Train the model
-train(train_images, train_labels, learning_rate=0.1, epochs=100)
+train(train_images, train_labels_encoded, learning_rate=0.1, epochs=100)
+
+# Predict function to evaluate on test set
+def predict(X):
+    _, _, _, A2 = forward_propagation(X)
+    return np.argmax(A2, axis=1)
+
+# Predict on the test set
+predicted_labels = predict(test_images)
+
+# Display a few test images along with the predicted and actual labels
+def display_images(images, actual_labels, predicted_labels, num_images=5):
+    plt.figure(figsize=(10, 5))
+    for i in range(num_images):
+        plt.subplot(1, num_images, i + 1)
+        plt.imshow(images[i].reshape(28, 28), cmap='gray')
+        plt.title(f"Actual: {actual_labels[i]}\nPredicted: {predicted_labels[i]}")
+        plt.axis('off')
+    plt.show()
+
+# Show the first 5 images from the test set along with their predicted and actual labels
+display_images(test_images, test_labels, predicted_labels, num_images=5)
